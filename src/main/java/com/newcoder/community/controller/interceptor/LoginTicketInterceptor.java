@@ -5,6 +5,7 @@ import com.newcoder.community.entity.User;
 import com.newcoder.community.service.UserService;
 import com.newcoder.community.util.CookieUtil;
 import com.newcoder.community.util.HostHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class LoginTicketInterceptor implements HandlerInterceptor {
 
     @Autowired
@@ -34,6 +36,7 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
             if(loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())) {
                 // 根据凭证查询用户
                 User user = userService.findUserById(loginTicket.getUserId());
+                log.debug("LoginTicketInterceptor-preHandle-线程信息为：" + Thread.currentThread().getName());
                 // 在本次请求中持有用户
                 hostHolder.setUser(user);
             }
@@ -46,11 +49,13 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         User user = hostHolder.getUser();
         if (user != null && modelAndView != null) {
             modelAndView.addObject("loginUser", user);
+            log.debug("LoginTicketInterceptor-postHandle-线程信息为：" + Thread.currentThread().getName());
         }
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        log.debug("LoginTicketInterceptor-afterCompletion-线程信息为：" + Thread.currentThread().getName());
         hostHolder.clear();
     }
 }
