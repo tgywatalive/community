@@ -28,6 +28,7 @@ public class MailTests {
     @Test
     public void testHtmlMail() {
         Context context = new Context();
+        // 后续将会从模板中获取用户注册信息
         context.setVariable("username", "sunday");
 
         String content = templateEngine.process("/mail/demo", context);
