@@ -165,6 +165,17 @@ public class LoginController implements CommunityConstant {
     }
 
     /*
-    *
+    * 获取验证码并验证邮箱是否存在
     * */
+    @RequestMapping(path = "/forget/code", method = RequestMethod.GET)
+    public String getForgetCode(String email, HttpSession session, Model model) {
+        Map<String, Object> map = userService.verifyEmail(email);
+        model.addAttribute("emailMsg", map.get("emailMsg"));
+        // 判断邮箱是否有注册信息
+        if (map.containsKey("user")) {
+            // 保存验证码
+            session.setAttribute(email + "verifyCode", map.get("code"));
+        }
+        return "/site/forget";
+    }
 }

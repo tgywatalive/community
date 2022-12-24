@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -184,4 +185,56 @@ public class UserService implements CommunityConstant {
         return userMapper.updateHeader(userId, headerUrl);
     }
 
+    /*
+    * 忘记密码-获取验证码
+    * 收到邮箱号后先查询
+    * 如果没注册则提示未注册
+    * 如果注册了查到有东西再发送验证码
+    * */
+    public Map<String, Object> verifyEmail(String email) {
+        Map<String, Object> map = new HashMap<>();
+        // 空值处理
+        if (StringUtils.isBlank(email)) {
+            map.put("emailMsg", "邮箱不能为空");
+            return map;
+        }
+        // 查找邮箱
+        User user = userMapper.selectByEmail(email);
+        // 未注册处理
+        if (user == null) {
+            map.put("emailMsg", "用户未注册");
+            return map;
+        } // 如果找到了注册过则发送邮箱
+        else {
+            // 激活邮件
+            Context context = new Context();
+            // 用户等下返回前端界面上显示email
+            context.setVariable("email", email);
+            // 生成四位验证码
+            String code = CommunityUtil.generateUUID().substring(0, 4);
+            context.setVariable("verifyCode", code);
+
+            String content = templateEngine.process("/mail/forget", context); // mail包下的activation.html
+            mailClient.sendMail(user.getEmail(), "找回密码", content);
+            map.put("code", code);
+        }
+        map.put("user", user);
+        return map;
+    }
+
+    // 忘记密码-重置密码
+    public Map<String, Object> resetPassword(String email, String password) {
+        Map<String, Object> map = new HashMap<>();
+
+        // 空值处理
+        if (StringUtils.isBlank(email)) {
+            map.put("emailMsg", "邮箱不能为空");
+        }
+        if (StringUtils.isBlank(password)) {
+            map.put("passwordMsg", "密码不能为空");
+        }
+
+        // 验证邮箱
+        return null;
+    }
 }
