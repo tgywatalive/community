@@ -1,5 +1,7 @@
 package com.newcoder.community.entity;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Date;
 
 public class DiscussPost {
