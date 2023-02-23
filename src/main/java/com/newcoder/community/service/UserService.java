@@ -237,4 +237,8 @@ public class UserService implements CommunityConstant {
         // 验证邮箱
         return null;
     }
+
+    public User findUserByName(String username) {
+        return userMapper.selectByName(username);
+    }
 }
