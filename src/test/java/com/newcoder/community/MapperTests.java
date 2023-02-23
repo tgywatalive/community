@@ -2,9 +2,11 @@ package com.newcoder.community;
 
 import com.newcoder.community.dao.DiscussPostMapper;
 import com.newcoder.community.dao.LoginTicketMapper;
+import com.newcoder.community.dao.MessageMapper;
 import com.newcoder.community.dao.UserMapper;
 import com.newcoder.community.entity.DiscussPost;
 import com.newcoder.community.entity.LoginTicket;
+import com.newcoder.community.entity.Message;
 import com.newcoder.community.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,9 @@ public class MapperTests {
 
     @Autowired
     private LoginTicketMapper loginTicketMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Test
     public void testSelectUser() {
@@ -111,5 +116,42 @@ public class MapperTests {
         post.setCreateTime(new Date());
 
         discussPostMapper.insertDiscussPost(post);
+    }
+
+    @Test
+    public void testSelectLetters() {
+        // 所有的最近消息（包括已读未读）
+        List<Message> list = messageMapper.selectConversations(111, 0, 20);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        System.out.println("====================");
+
+        // 查询最近消息数量
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        System.out.println("====================");
+
+        // 查询某一私信
+        list = messageMapper.selectLetters("111_112", 0, 10);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        System.out.println("====================");
+
+        // 查询某一私信数量
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+
+        System.out.println("====================");
+
+        // 未读消息数
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
+
+        System.out.println("====================");
     }
 }
